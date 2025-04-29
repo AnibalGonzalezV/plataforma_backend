@@ -5,17 +5,26 @@ import {
   Param,
   Body,
   NotFoundException,
+  Patch,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserService } from '../../application/services/user.service';
+import { CreateUserDto } from '../../application/dto/create-user.dto';
 
 @Controller('usuarios')
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
+  }
+
+  @Patch(':id/roles')
+  async assingRoles(
+    @Param('id') id: number,
+    @Body() dto: { roleIds: number[] },
+  ) {
+    return this.usersService.assingRoles(id, dto.roleIds);
   }
 
   @Get('all')

@@ -45,4 +45,10 @@ export class UserService {
     user.roles = roles;
     return await this.userRepo.save(user);
   }
+
+  async findById(id: number): Promise<User> {
+    const user = await this.userRepo.findById(id);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    return user;
+  }
 }

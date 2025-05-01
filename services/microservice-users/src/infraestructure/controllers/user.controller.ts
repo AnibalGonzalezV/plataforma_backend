@@ -32,6 +32,15 @@ export class UserController {
     return this.usersService.findAll();
   }
 
+  @Get(':id/roles')
+  async getUserRoles(@Param('id') id: number) {
+    const user = await this.usersService.findById(id);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    return user.roles;
+  }
+
   @Get('by-email/:email')
   async getUserByEmail(@Param('email') email: string) {
     const user = await this.usersService.findByEmail(email);

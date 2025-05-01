@@ -19,7 +19,7 @@ export class UserRepository extends Repository<User> {
   }
 
   async findById(id: number): Promise<User | null> {
-    return this.findOne({ where: { id } });
+    return this.findOne({ where: { id }, relations: ['roles'] });
   }
 
   async saveUser(user: User): Promise<User> {

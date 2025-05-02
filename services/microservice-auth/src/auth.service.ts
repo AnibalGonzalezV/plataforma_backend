@@ -43,7 +43,11 @@ export class AuthService {
       throw new UnauthorizedException('Usuario inválido');
     }
 
-    const payload = { email: user.email, sub: user.id };
+    const { data: roles } = await firstValueFrom(
+      this.http.get(`http://localhost:3002/usuarios/${user.id}/roles`)
+    );
+
+    const payload = { email: user.email, sub: user.id, roles: roles };
     return {
       access_token: this.jwtService.sign(payload),
       user,

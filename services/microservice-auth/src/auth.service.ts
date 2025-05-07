@@ -15,7 +15,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     try {
       const { data: user } = await firstValueFrom(
-        this.http.get(`http://localhost:3002/usuarios/by-email/${email}`),
+        this.http.get(`http://user-service/usuarios/by-email/${email}`),
       );
 
       if (!user) {
@@ -44,7 +44,7 @@ export class AuthService {
     }
 
     const { data: roles } = await firstValueFrom(
-      this.http.get(`http://localhost:3002/usuarios/${user.id}/roles`)
+      this.http.get(`http://user-service/usuarios/${user.id}/roles`),
     );
 
     const payload = { email: user.email, sub: user.id, roles: roles };

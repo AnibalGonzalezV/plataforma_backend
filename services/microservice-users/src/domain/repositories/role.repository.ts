@@ -12,7 +12,9 @@ export class RoleRepository extends Repository<Role> {
   }
 
   async findAllRoles(): Promise<Role[]> {
-    return this.find();
+    return this.find({
+      loadRelationIds: true, // evita cargar recursivamente los usuarios
+    });
   }
 
   async createRole(role: Partial<Role>): Promise<Role> {

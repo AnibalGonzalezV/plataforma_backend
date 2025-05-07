@@ -3,16 +3,17 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy only the package files first
+# Copia package files primero
 COPY package.json yarn.lock ./
 
-# Install dependencies
+# Instala todas las dependencias (dev y prod)
 RUN yarn install --frozen-lockfile
 
-# Copy the rest of the source code
-COPY . .
+# Copia solo el código fuente
+COPY tsconfig.json ./
+COPY src ./src
 
-# Build the TypeScript project
+# Compila TypeScript
 RUN yarn run build
 
 # Stage 2: Production image
@@ -20,13 +21,13 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy only the built code and package files
+# Copia solo lo necesario para producción
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/yarn.lock ./
 
-# Install only production dependencies
+# Instala solo dependencias de producción
 RUN yarn install --frozen-lockfile --production
 
-# Set the command (adjust the entry point if needed)
-CMD ["yarn", "start:prod"]
+# Comando de inicio
+CMD ["yarn", "start"]

@@ -16,6 +16,7 @@ export class UserController {
 
   @Post('create')
   create(@Body() dto: CreateUserDto) {
+    console.log('AQUI ENTRANDO AL CONTROLADOR');
     return this.usersService.create(dto);
   }
 

@@ -47,10 +47,9 @@ export class AuthService {
       this.http.get(`http://user-service:3002/usuarios/${user.id}/roles`),
     );
 
-    const payload = { email: user.email, sub: user.id, roles: roles };
+    const payload = { name: user.names, email: user.email, sub: user.id, roles: roles };
     return {
-      access_token: this.jwtService.sign(payload),
-      user,
+      access_token: this.jwtService.sign(payload)
     };
   }
 }

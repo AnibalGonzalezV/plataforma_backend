@@ -51,4 +51,8 @@ export class UserService {
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
+
+  async getUsersCountByRole(): Promise<{ role: string; count: number }[]> {
+    return await this.userRepo.countUsersByRole();
+  }
 }

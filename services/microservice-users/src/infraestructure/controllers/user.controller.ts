@@ -50,4 +50,9 @@ export class UserController {
     }
     return user;
   }
+
+  @Get('count-by-role')
+  async getUsersCountByRole() {
+    return this.usersService.getUsersCountByRole();
+  }
 }

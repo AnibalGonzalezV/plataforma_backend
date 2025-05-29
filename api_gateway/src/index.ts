@@ -1,6 +1,5 @@
 import cors from 'cors'
 import express from 'express'
-import { createProxyMiddleware } from 'http-proxy-middleware'
 import httpProxy from './proxies/http_proxy'
 
 const app = express()
@@ -16,6 +15,10 @@ app.get('/', (_, res) => {
 app.use('/users', httpProxy('http://user-service:3002'))
 
 app.use('/auth', httpProxy('http://auth-service:3001'))
+
+app.use('/orders', httpProxy('http://order-service:3005'))
+
+app.use('/metrics', httpProxy('http://metrics-service:3004'))
 
 app.listen(port, () => {
 	console.log(`API Gateway is running at http://localhost:${port}`)

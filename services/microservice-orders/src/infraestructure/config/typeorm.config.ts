@@ -1,4 +1,3 @@
-// src/infraestructure/config/typeorm.config.ts
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 

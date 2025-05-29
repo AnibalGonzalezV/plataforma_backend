@@ -25,4 +25,13 @@ export class UserRepository extends Repository<User> {
   async saveUser(user: User): Promise<User> {
     return this.save(user);
   }
+
+  async countUsersByRole(): Promise<{ role: string; count: number }[]> {
+    return this.createQueryBuilder('user')
+      .leftJoin('user.roles', 'role')
+      .select('role.name', 'role')
+      .addSelect('COUNT(user.id)', 'count')
+      .groupBy('role.name')
+      .getRawMany();
+  }
 }

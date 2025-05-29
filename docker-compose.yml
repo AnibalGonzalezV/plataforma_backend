@@ -53,5 +53,44 @@ services:
       - auth-service
       - user-service
 
+  metrics-service:
+    build: ./services/microservice-metrics
+    ports:
+      - '3004:3004'
+    environment:
+      USER_SERVICE_URL: http://user-service:3002
+    depends_on:
+      - user-service
+      - auth-service
+      - orders-service
+    entrypoint:
+      [
+        'sh',
+        '-c',
+        'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
+      ]
+
+  orders-service:
+    build: ./services/microservice-orders
+    ports:
+      - '3005:3005'
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: minombre2
+      DB_NAME: proyecto_web_movil
+      USER_SERVICE_URL: http://user-service:3002
+    depends_on:
+      - postgres
+      - user-service
+      - auth-service
+    entrypoint:
+      [
+        'sh',
+        '-c',
+        'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
+      ]
+
 volumes:
   postgres_data:

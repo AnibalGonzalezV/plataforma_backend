@@ -25,6 +25,24 @@ export class OrderController {
     return this.orderService.findAllOrders();
   }
 
+  @Get('new-orders')
+  findNewOrders() {
+    return this.orderService.findNewOrders();
+  }
+
+  @Get('state-count')
+  countOrdersByDeliveryState() {
+    return this.orderService.countOrdersByDeliveryState();
+  }
+
+  @Post('assign/:orderId/:courierId')
+  assignOrderToCourier(
+    @Param('orderId') orderId: number,
+    @Param('courierId') courierId: number,
+  ) {
+    return this.orderService.assignOrderToCourier(orderId, courierId);
+  }
+
   @Get(':id')
   findById(@Param('id') id: number) {
     return this.orderService.findOrderById(id);
@@ -38,10 +56,5 @@ export class OrderController {
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.orderService.deleteOrder(id);
-  }
-
-  @Get('state-count')
-  countOrdersByDeliveryState() {
-    return this.orderService.countOrdersByDeliveryState();
   }
 }

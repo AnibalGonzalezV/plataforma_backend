@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { MetricsModule } from './infraestructure/modules/metrics.module';
+import { MetricsModule } from './infrastructure/modules/metrics.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(MetricsModule);

@@ -37,4 +37,16 @@ export class OrderRepository extends Repository<Order> {
       .groupBy('order.deliveryState')
       .getRawMany();
   }
+
+  async findNewOrders(): Promise<Order[]> {
+    return this.find({ where: { deliveryState: 'nuevo' } });
+  }
+
+  async assignOrderToCourier(
+    orderId: number,
+    courierId: number,
+  ): Promise<Order | null> {
+    await this.updateOrder(orderId, { courierId, deliveryState: 'activo' });
+    return this.findById(orderId);
+  }
 }

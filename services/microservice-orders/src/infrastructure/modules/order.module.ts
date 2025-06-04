@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Order } from 'src/domain/entities/order.entity';
 import { OrderService } from 'src/application/services/order.service';
 import { OrderController } from '../controllers/order.controller';
 import { OrderRepository } from 'src/domain/repositories/order.repository';
 import { DataSource } from 'typeorm';
-
+import { HttpModule } from '@nestjs/axios';
 @Module({
-  imports: [TypeOrmModule.forFeature([Order])],
+  imports: [HttpModule],
   controllers: [OrderController],
   providers: [
     OrderService,
@@ -17,6 +15,5 @@ import { DataSource } from 'typeorm';
       inject: [DataSource],
     },
   ],
-  exports: [OrderService],
 })
 export class OrderModule {}

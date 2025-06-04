@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -15,9 +16,6 @@ export class Product {
   productId: number;
 
   @Column()
-  categoryId: number;
-
-  @Column()
   name: string;
 
   @Column()
@@ -30,6 +28,7 @@ export class Product {
   price: number;
 
   @ManyToOne(() => Category, (category) => category.products)
+  @JoinColumn({ name: 'category_id' }) // define el nombre de la columna en la base de datos
   category: Category;
 
   @ManyToMany(() => Tag, (tag) => tag.products, { cascade: true })

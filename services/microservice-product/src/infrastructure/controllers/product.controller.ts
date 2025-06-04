@@ -20,6 +20,11 @@ export class ProductController {
     return this.productService.create(dto);
   }
 
+  @Get('store/:storeId')
+  findByStoreId(@Param('storeId') storeId: number) {
+    return this.productService.findByStoreId(storeId);
+  }
+
   @Get('all')
   findAll() {
     return this.productService.findAll();

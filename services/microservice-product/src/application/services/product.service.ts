@@ -16,6 +16,10 @@ export class ProductService {
     return this.productRepository.findAll();
   }
 
+  async findByStoreId(storeId: number): Promise<Product[]> {
+    return this.productRepository.findByStoreId(storeId);
+  }
+
   async findById(id: number): Promise<Product | null> {
     return this.productRepository.findById(id);
   }

@@ -10,6 +10,7 @@ import {
 import { OrderService } from 'src/application/services/order.service';
 import { CreateOrderDto } from 'src/application/dtos/create-order.dto';
 import { UpdateOrderDto } from 'src/application/dtos/update-order.dto';
+import { UpdateOrderItemDto } from 'src/application/dtos/update-order-item.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -35,6 +36,11 @@ export class OrderController {
     return this.orderService.countOrdersByDeliveryState();
   }
 
+  @Get(':id/items')
+  getItemsByOrder(@Param('id') id: number) {
+    return this.orderService.getItemsByOrderId(id);
+  }
+
   @Post('assign/:orderId/:courierId')
   assignOrderToCourier(
     @Param('orderId') orderId: number,
@@ -53,8 +59,29 @@ export class OrderController {
     return this.orderService.updateOrder(id, dto);
   }
 
+  @Patch(':orderId/items/update')
+  updateItemQuantity(
+    @Param('orderId') orderId: number,
+    @Body() dto: UpdateOrderItemDto,
+  ) {
+    return this.orderService.updateOrderItemsQuantity(orderId, dto);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.orderService.deleteOrder(id);
+  }
+
+  @Delete(':orderId/items/:productId')
+  deleteItem(
+    @Param('orderId') orderId: number,
+    @Param('productId') productId: number,
+  ) {
+    return this.orderService.deleteOrderItem(orderId, productId);
+  }
+
+  @Delete(':orderId/items')
+  clearOrderItems(@Param('orderId') orderId: number) {
+    return this.orderService.clearOrderItems(orderId);
   }
 }

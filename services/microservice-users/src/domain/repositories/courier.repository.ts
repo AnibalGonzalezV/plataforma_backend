@@ -11,11 +11,23 @@ export class CourierRepository extends Repository<Courier> {
     return this.save(newCourier);
   }
 
-  findAll(): Promise<Courier[]> {
-    return this.find({ relations: ['user'] });
+  async findAll(): Promise<any[]> {
+    const couriers = await this.find({ relations: ['user'] });
+
+    return couriers.map(({ id, vehicleType, available, user }) => ({
+      id,
+      vehicleType,
+      available,
+      user: {
+        id: user.id,
+        email: user.email,
+        names: user.names,
+        lastNames: user.lastNames,
+      },
+    }));
   }
 
-  findById(id: number): Promise<Courier | null> {
+  async findById(id: number): Promise<Courier | null> {
     return this.findOne({ where: { id }, relations: ['user'] });
   }
 

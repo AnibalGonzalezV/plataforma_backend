@@ -15,6 +15,10 @@ export class CategoryRepository extends Repository<Category> {
     return this.findOne({ where: { categoryId: id }, relations: ['products'] });
   }
 
+  async findByName(name: string): Promise<Category | null> {
+    return await this.findOne({ where: { name }, relations: ['products'] });
+  }
+
   async findAll(): Promise<Category[]> {
     return this.find({ relations: ['products'] });
   }
@@ -29,5 +33,20 @@ export class CategoryRepository extends Repository<Category> {
 
   async deleteCategory(id: number): Promise<void> {
     await this.delete(id);
+  }
+
+  async findByStoreId(storeId: number): Promise<Category[]> {
+    return this.createQueryBuilder('category')
+      .innerJoin('category.products', 'product')
+      .where('product.storeId = :storeId', { storeId })
+      .distinct(true)
+      .getMany();
+  }
+
+  async findByStoreIdWithProducts(storeId: number): Promise<Category[]> {
+    return this.createQueryBuilder('category')
+      .leftJoinAndSelect('category.products', 'product')
+      .where('product.storeId = :storeId', { storeId })
+      .getMany();
   }
 }

@@ -6,7 +6,7 @@ export class StoreRepository extends Repository<Store> {
     super(Store, dataSource.createEntityManager());
   }
   async findById(id: number): Promise<Store | null> {
-    return this.findOne({ where: { id } });
+    return this.findOne({ where: { id }, relations: ['owner'] });
   }
 
   async findAll(): Promise<Store[]> {

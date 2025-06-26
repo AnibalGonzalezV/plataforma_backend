@@ -5,9 +5,10 @@ import { ProductRepository } from 'src/domain/repositories/product.repository';
 import { ProductService } from 'src/application/services/product.service';
 import { ProductController } from '../controllers/product.controller';
 import { DataSource } from 'typeorm';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product])],
+  imports: [TypeOrmModule.forFeature([Product]), HttpModule],
   controllers: [ProductController],
   providers: [
     ProductService,

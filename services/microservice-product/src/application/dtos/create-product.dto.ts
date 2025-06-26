@@ -4,6 +4,9 @@ export class CreateProductDto {
   @IsNumber()
   categoryId: number;
 
+  @IsNumber()
+  storeId: number;
+
   @IsString()
   name: string;
 
@@ -20,4 +23,8 @@ export class CreateProductDto {
   @IsArray()
   @IsNumber({}, { each: true })
   tagIds?: number[];
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

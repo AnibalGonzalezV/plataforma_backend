@@ -6,9 +6,12 @@ import {
   Body,
   NotFoundException,
   Patch,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from '../../application/services/user.service';
 import { CreateUserDto } from '../../application/dto/create-user.dto';
+import { ChangePasswordDto } from 'src/application/dto/change-password.dto';
 
 @Controller('usuarios')
 export class UserController {
@@ -16,7 +19,6 @@ export class UserController {
 
   @Post('create')
   create(@Body() dto: CreateUserDto) {
-    console.log('AQUI ENTRANDO AL CONTROLADOR');
     return this.usersService.create(dto);
   }
 
@@ -26,6 +28,31 @@ export class UserController {
     @Body() dto: { roleIds: number[] },
   ) {
     return this.usersService.assingRoles(id, dto.roleIds);
+  }
+
+  @Patch('change-password')
+  async changePassword(@Req() req: Request, @Body() dto: ChangePasswordDto) {
+    const userId = parseInt(req.headers['x-user-id'] as string);
+
+    if (!userId) {
+      throw new UnauthorizedException('Usuario no autenticado');
+    }
+
+    return this.usersService.changePassword(
+      userId,
+      dto.oldPassword,
+      dto.newPassword,
+    );
+  }
+
+  @Patch(':id/disable')
+  async disableUser(@Param('id') id: number) {
+    return this.usersService.setActiveStatus(+id, false);
+  }
+
+  @Patch(':id/enable')
+  async enableUser(@Param('id') id: number) {
+    return this.usersService.setActiveStatus(+id, true);
   }
 
   @Get('all')

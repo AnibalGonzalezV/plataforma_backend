@@ -23,6 +23,11 @@ export class AuthService {
         throw new UnauthorizedException('Usuario no encontrado');
       }
 
+      if (!user.isActive) {
+        console.log('Usuario inactivo');
+        throw new UnauthorizedException('Usuario inactivo');
+      }
+
       const passwordValid = await bcrypt.compare(password, user.password);
 
       if (!passwordValid) {
@@ -47,9 +52,30 @@ export class AuthService {
       this.http.get(`http://user-service:3002/usuarios/${user.id}/roles`),
     );
 
-    const payload = { name: user.names, email: user.email, sub: user.id, roles: roles };
-    return {
-      access_token: this.jwtService.sign(payload)
+    const payload = {
+      name: user.names,
+      email: user.email,
+      sub: user.id,
+      roles: roles,
     };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async verifyToken(token: string): Promise<any> {
+    try {
+      const payloda = await this.jwtService.verifyAsync(token, {
+        secret: 'jwt-secret-key', //IDEALMENTE CAMBIAR POR UNA VARIABLE DE ENTORNO
+      });
+
+      return {
+        userId: payloda.sub,
+        email: payloda.email,
+        roles: payloda.roles,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Token inválido o expirado');
+    }
   }
 }

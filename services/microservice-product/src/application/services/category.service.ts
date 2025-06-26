@@ -33,19 +33,11 @@ export class CategoryService {
     return this.categoryRepo.deleteCategory(id);
   }
 
-  async getCategoryWithStore(id: number): Promise<any> {
-    const category = await this.categoryRepo.findById(id);
-    if (!category) throw new NotFoundException('Categoría no encontrada');
+  async findByStoreId(storeId: number): Promise<Category[]> {
+    return this.categoryRepo.findByStoreId(storeId);
+  }
 
-    const store = await firstValueFrom(
-      this.httpService.get(
-        `http://localhost:3003/users/stores/${category.storeId}`,
-      ),
-    ).then((res) => res.data);
-
-    return {
-      ...category,
-      store,
-    };
+  async findByStoreIdWithProducts(storeId: number): Promise<Category[]> {
+    return this.categoryRepo.findByStoreIdWithProducts(storeId);
   }
 }

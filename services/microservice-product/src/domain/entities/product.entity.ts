@@ -27,6 +27,12 @@ export class Product {
   @Column('numeric', { precision: 15, scale: 0 })
   price: number;
 
+  @Column({ name: 'store_id' })
+  storeId: number;
+
+  @Column({ name: 'image_url', nullable: true })
+  imageUrl?: string;
+
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'category_id' }) // define el nombre de la columna en la base de datos
   category: Category;

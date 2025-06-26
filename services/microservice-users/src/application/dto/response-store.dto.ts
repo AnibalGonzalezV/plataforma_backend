@@ -4,4 +4,5 @@ export class ResponseStoreDto {
   name: string;
   address: string;
   score?: number;
+  imageUrl?: string;
 }

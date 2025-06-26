@@ -30,6 +30,18 @@ services:
         'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
       ]
 
+  seed-users:
+    build: ./services/microservice-users
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: minombre2
+      DB_NAME: proyecto_web_movil
+    depends_on:
+      - postgres
+    command: sh -c "until nc -z user-service 3002; do echo 'Esperando PostgresSQL...'; sleep 1; done; yarn seed:prod"
+
   auth-service:
     build: ./services/microservice-auth
     ports:
@@ -49,6 +61,8 @@ services:
     build: ./api_gateway
     ports:
       - '3003:3003'
+    volumes:
+      - ./api_gateway/public:/app/public
     depends_on:
       - auth-service
       - user-service
@@ -114,6 +128,18 @@ services:
         '-c',
         'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
       ]
+
+  seed-products:
+    build: ./services/microservice-product
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: minombre2
+      DB_NAME: proyecto_web_movil
+    depends_on:
+      - postgres
+    command: sh -c "until nc -z products-service 3006; do echo 'Esperando PostgresSQL...'; sleep 1; done; yarn seed:prod"
 
 volumes:
   postgres_data:

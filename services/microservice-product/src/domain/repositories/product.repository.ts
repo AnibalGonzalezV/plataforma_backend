@@ -30,6 +30,8 @@ export class ProductRepository extends Repository<Product> {
       price: dto.price,
       category,
       tags,
+      storeId: dto.storeId,
+      imageUrl: dto.imageUrl || null,
     });
 
     return this.save(newProduct);
@@ -38,6 +40,16 @@ export class ProductRepository extends Repository<Product> {
   async findById(id: number): Promise<Product | null> {
     return this.findOne({
       where: { productId: id },
+      relations: ['category', 'tags'],
+    });
+  }
+
+  async findByNameAndStore(
+    name: string,
+    storeId: number,
+  ): Promise<Product | null> {
+    return this.findOne({
+      where: { name, storeId },
       relations: ['category', 'tags'],
     });
   }
@@ -80,10 +92,25 @@ export class ProductRepository extends Repository<Product> {
   }
 
   async findByStoreId(storeId: number): Promise<Product[]> {
+    return this.find({
+      where: { storeId },
+      relations: ['category', 'tags'],
+    });
+  }
+
+  async findByCategoryId(categoryId: number): Promise<Product[]> {
+    return this.find({
+      where: { category: { categoryId } },
+      relations: ['category', 'tags'],
+    });
+  }
+
+  async findByTagId(tagId: number): Promise<Product[]> {
     return this.createQueryBuilder('product')
+      .innerJoin('product.tags', 'tag')
+      .where('tag.tagId = :tagId', { tagId })
       .leftJoinAndSelect('product.category', 'category')
-      .leftJoinAndSelect('product.tags', 'tag')
-      .where('category.storeId = :storeId', { storeId })
+      .leftJoinAndSelect('product.tags', 'tags')
       .getMany();
   }
 }

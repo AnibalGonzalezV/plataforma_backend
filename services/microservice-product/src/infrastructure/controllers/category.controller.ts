@@ -30,6 +30,16 @@ export class CategoryController {
     return this.categoryService.findById(id);
   }
 
+  @Get('store/:storeId')
+  findByStoreId(@Param('storeId') storeId: number) {
+    return this.categoryService.findByStoreId(storeId);
+  }
+
+  @Get('store/:storeId/with-products')
+  findByStoreIdWithProducts(@Param('storeId') storeId: number) {
+    return this.categoryService.findByStoreIdWithProducts(Number(storeId));
+  }
+
   @Patch(':id')
   update(@Param('id') id: number, @Body() dto: UpdateCategoryDto) {
     return this.categoryService.update(id, dto);
@@ -38,10 +48,5 @@ export class CategoryController {
   @Delete(':id')
   delete(@Param('id') id: number) {
     return this.categoryService.delete(id);
-  }
-
-  @Get(':id/with-store')
-  getCategoryWithStore(@Param('id') id: number) {
-    return this.categoryService.getCategoryWithStore(id);
   }
 }

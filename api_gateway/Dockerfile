@@ -12,6 +12,7 @@ RUN yarn install --frozen-lockfile
 # Copia solo el código fuente
 COPY tsconfig.json ./
 COPY src ./src
+COPY public ./public
 
 # Compila TypeScript
 RUN yarn run build

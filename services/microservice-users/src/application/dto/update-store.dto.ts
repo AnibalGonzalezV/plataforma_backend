@@ -12,4 +12,8 @@ export class UpdateStoreDto {
   @IsOptional()
   @IsNumber()
   score?: number;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

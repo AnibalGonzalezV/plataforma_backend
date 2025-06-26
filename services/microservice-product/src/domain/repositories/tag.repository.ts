@@ -15,6 +15,10 @@ export class TagRepository extends Repository<Tag> {
     return await this.find();
   }
 
+  async findByName(name: string): Promise<Tag | null> {
+    return await this.findOne({ where: { name } });
+  }
+
   async findById(tagId: number): Promise<Tag | null> {
     return await this.findOne({ where: { tagId } });
   }

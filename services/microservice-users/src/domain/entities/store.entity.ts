@@ -22,6 +22,9 @@ export class Store {
   @Column()
   address: string;
 
+  @Column({ name: 'image_url', nullable: true })
+  imageUrl?: string;
+
   @Column({ type: 'numeric', precision: 2, scale: 1, nullable: true })
   score: number | null; // Cambiado a nullable: true para permitir valores nulos
 }

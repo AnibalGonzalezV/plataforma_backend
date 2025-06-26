@@ -6,6 +6,10 @@ export class UpdateProductDto {
   categoryId?: number;
 
   @IsOptional()
+  @IsNumber()
+  storeId?: number;
+
+  @IsOptional()
   @IsString()
   name?: string;
 
@@ -25,4 +29,8 @@ export class UpdateProductDto {
   @IsArray()
   @IsNumber({}, { each: true })
   tagIds?: number[];
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

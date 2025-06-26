@@ -6,6 +6,9 @@ import {
   Param,
   Patch,
   Delete,
+  Req,
+  UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProductService } from 'src/application/services/product.service';
 import { CreateProductDto } from 'src/application/dtos/create-product.dto';
@@ -16,32 +19,57 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post('create')
-  create(@Body() dto: CreateProductDto) {
+  async create(@Body() dto: CreateProductDto) {
     return this.productService.create(dto);
   }
 
   @Get('store/:storeId')
-  findByStoreId(@Param('storeId') storeId: number) {
+  async findByStoreId(@Param('storeId') storeId: number) {
     return this.productService.findByStoreId(storeId);
   }
 
   @Get('all')
-  findAll() {
+  async findAll() {
     return this.productService.findAll();
   }
 
   @Get(':id')
-  findById(@Param('id') id: number) {
+  async findById(@Param('id') id: number) {
     return this.productService.findById(id);
   }
 
+  @Get('category/:categoryId')
+  async findByCateogoryId(@Param('categoryId') categoryId: number) {
+    return this.productService.findByCategoryId(categoryId);
+  }
+
+  @Get('tag/:tagId')
+  async findByTag(@Param('tagId') tagId: number) {
+    return this.productService.findByTagId(Number(tagId));
+  }
+
   @Patch(':id')
-  update(@Param('id') id: number, @Body() dto: UpdateProductDto) {
-    return this.productService.update(id, dto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateDto: UpdateProductDto,
+    @Req() req: any,
+  ) {
+    const userId = Number(req.headers['x-user-id']);
+    if (!userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    try {
+      return await this.productService.update(id, updateDto, userId);
+    } catch (error) {
+      if (error.message.includes('Unauthorized')) {
+        throw new UnauthorizedException(error.message);
+      }
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Delete(':id')
-  delete(@Param('id') id: number) {
+  async delete(@Param('id') id: number) {
     return this.productService.delete(id);
   }
 }

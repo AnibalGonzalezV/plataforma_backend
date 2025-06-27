@@ -1,11 +1,13 @@
+version: '3.8'
+
 services:
   postgres:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: minombre2
-      POSTGRES_DB: proyecto_web_movil
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -16,28 +18,28 @@ services:
     ports:
       - '3002:3002'
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: minombre2
-      DB_NAME: proyecto_web_movil
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     depends_on:
       - postgres
     entrypoint:
       [
         'sh',
         '-c',
-        'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
+        'until nc -z ${DB_HOST} ${DB_PORT}; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
       ]
 
   seed-users:
     build: ./services/microservice-users
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: minombre2
-      DB_NAME: proyecto_web_movil
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     depends_on:
       - postgres
     command: sh -c "until nc -z user-service 3002; do echo 'Esperando PostgresSQL...'; sleep 1; done; yarn seed:prod"
@@ -47,14 +49,14 @@ services:
     ports:
       - '3001:3001'
     environment:
-      USER_SERVICE_URL: http://user-service:3002
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
     depends_on:
       - user-service
     entrypoint:
       [
         'sh',
         '-c',
-        'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
+        'until nc -z ${DB_HOST} ${DB_PORT}; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
       ]
 
   api-gateway:
@@ -72,7 +74,7 @@ services:
     ports:
       - '3004:3004'
     environment:
-      USER_SERVICE_URL: http://user-service:3002
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
     depends_on:
       - user-service
       - auth-service
@@ -81,7 +83,7 @@ services:
       [
         'sh',
         '-c',
-        'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
+        'until nc -z ${DB_HOST} ${DB_PORT}; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
       ]
 
   orders-service:
@@ -89,12 +91,12 @@ services:
     ports:
       - '3005:3005'
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: minombre2
-      DB_NAME: proyecto_web_movil
-      USER_SERVICE_URL: http://user-service:3002
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
     depends_on:
       - postgres
       - user-service
@@ -103,7 +105,7 @@ services:
       [
         'sh',
         '-c',
-        'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
+        'until nc -z ${DB_HOST} ${DB_PORT}; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
       ]
 
   products-service:
@@ -111,12 +113,12 @@ services:
     ports:
       - '3006:3006'
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: minombre2
-      DB_NAME: proyecto_web_movil
-      USER_SERVICE_URL: http://user-service:3002
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
     depends_on:
       - postgres
       - user-service
@@ -126,17 +128,17 @@ services:
       [
         'sh',
         '-c',
-        'until nc -z postgres 5432; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
+        'until nc -z ${DB_HOST} ${DB_PORT}; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
       ]
 
   seed-products:
     build: ./services/microservice-product
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: minombre2
-      DB_NAME: proyecto_web_movil
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     depends_on:
       - postgres
     command: sh -c "until nc -z products-service 3006; do echo 'Esperando PostgresSQL...'; sleep 1; done; yarn seed:prod"

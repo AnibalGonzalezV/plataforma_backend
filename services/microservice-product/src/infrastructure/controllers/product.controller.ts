@@ -68,6 +68,18 @@ export class ProductController {
     }
   }
 
+  @Post('bulk-check')
+  async bulkCheck(@Body() productIds: number[]) {
+    return this.productService.bulkCheck(productIds);
+  }
+
+  @Post('decrease-stock')
+  async decreaseStock(
+    @Body() items: { productId: number; quantity: number }[],
+  ) {
+    return this.productService.decreaseStock(items);
+  }
+
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.productService.delete(id);

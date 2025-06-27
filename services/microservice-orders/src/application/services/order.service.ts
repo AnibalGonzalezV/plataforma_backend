@@ -20,7 +20,52 @@ export class OrderService {
   async createOrder(dto: CreateOrderDto): Promise<Order> {
     const { items, ...orderData } = dto;
 
-    const order = await this.orderRepo.createOrder(orderData);
+    const productIds = items.map((item) => item.productId);
+
+    // 1. Obtener datos de productos desde products-service
+    const { data: products } = await firstValueFrom(
+      this.httpService.post(
+        `${process.env.PRODUCT_SERVICE_URL}/products/bulk-check`,
+        {
+          productIds,
+        },
+      ),
+    );
+
+    // 2. Verificar stock y calcular total
+    let total = 0;
+    for (const item of items) {
+      const product = products.find((p) => p.productId === item.productId);
+      if (!product) {
+        throw new HttpException(
+          `Producto con ID ${item.productId} no encontrado`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (product.quantity < item.quantity) {
+        throw new HttpException(
+          `Stock insuficiente para ${product.name}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      total += Number(product.price) * item.quantity;
+    }
+
+    // 3. Descontar stock
+    await firstValueFrom(
+      this.httpService.post(
+        `${process.env.PRODUCT_SERVICE_URL}/products/bulk-decrease-stock`,
+        items,
+      ),
+    );
+
+    // 4. Crear orden
+    const order = await this.orderRepo.createOrder({
+      ...orderData,
+      totalAmount: total,
+    });
 
     const orderItems: OrderItem[] = items.map((item) => ({
       orderId: order.id,
@@ -76,7 +121,7 @@ export class OrderService {
     // 1. Verificar disponibilidad
     const { data: courier } = await firstValueFrom(
       this.httpService.get(
-        `http://user-service:3002/users/couriers/${courierId}`,
+        `${process.env.USER_SERVICE_URL}/users/couriers/${courierId}`,
       ),
     );
 
@@ -96,7 +141,7 @@ export class OrderService {
     // 3. Marcar courier como no disponible
     await firstValueFrom(
       this.httpService.patch(
-        `http://user-service:3002/users/couriers/${courierId}`,
+        `${process.env.USER_SERVICE_URL}/users/couriers/${courierId}`,
         {
           available: false,
         },

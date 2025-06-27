@@ -8,7 +8,7 @@ export class MetricsService {
 
   async getUsersCountByRole(): Promise<{ role: string; count: number }[]> {
     const { data } = await firstValueFrom(
-      this.http.get('http://user-service:3002/usuarios/count-by-role'),
+      this.http.get(`${process.env.USER_SERVICE_URL}/usuarios/count-by-role`),
     );
     return data.map((entry: any) => ({
       role: entry.role,

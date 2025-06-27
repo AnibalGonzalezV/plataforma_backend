@@ -9,6 +9,7 @@ import { CreateProductDto } from '../dtos/create-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
 import { HttpService } from '@nestjs/axios';
 import { last, lastValueFrom } from 'rxjs';
+import { In } from 'typeorm';
 
 @Injectable()
 export class ProductService {
@@ -20,7 +21,9 @@ export class ProductService {
   private async validateStore(storeId: number): Promise<void> {
     try {
       await lastValueFrom(
-        this.httpService.get(`http://user-service:3002/stores/${storeId}`),
+        this.httpService.get(
+          `${process.env.USER_SERVICE_URL}/stores/${storeId}`,
+        ),
       );
     } catch (err) {
       throw new NotFoundException(`Tienda con ID ${storeId} no encontrada`);
@@ -61,7 +64,7 @@ export class ProductService {
     }
 
     const storeResponse = await lastValueFrom(
-      this.httpService.get(`http://user-service:3002/stores/${storeId}`),
+      this.httpService.get(`${process.env.USER_SERVICE_URL}/stores/${storeId}`),
     );
     const store = storeResponse.data;
 
@@ -88,5 +91,38 @@ export class ProductService {
 
   async findByTagId(tagId: number): Promise<Product[]> {
     return this.productRepository.findByTagId(tagId);
+  }
+
+  async bulkCheck(productIds: number[]): Promise<any[]> {
+    const products = await this.productRepository.findBy({
+      productId: In(productIds),
+    });
+    return products.map((p) => ({
+      productId: p.productId,
+      name: p.name,
+      quantity: p.quantity,
+      price: p.price,
+    }));
+  }
+
+  async decreaseStock(
+    items: { productId: number; quantity: number }[],
+  ): Promise<{ message: string }> {
+    for (const item of items) {
+      const product = await this.productRepository.findById(item.productId);
+      if (!product) {
+        throw new NotFoundException(
+          `Producto con ID ${item.productId} no encontrado`,
+        );
+      }
+      if (product.quantity < item.quantity) {
+        throw new NotFoundException(
+          `Stock insuficiente para el producto ${product.name}`,
+        );
+      }
+      product.quantity -= item.quantity;
+      await this.productRepository.save(product);
+    }
+    return { message: 'Stock actualizado correctamente' };
   }
 }

@@ -15,7 +15,9 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     try {
       const { data: user } = await firstValueFrom(
-        this.http.get(`http://user-service:3002/usuarios/by-email/${email}`),
+        this.http.get(
+          `${process.env.USER_SERVICE_URL}/usuarios/by-email/${email}`,
+        ),
       );
 
       if (!user) {
@@ -66,7 +68,7 @@ export class AuthService {
   async verifyToken(token: string): Promise<any> {
     try {
       const payloda = await this.jwtService.verifyAsync(token, {
-        secret: 'jwt-secret-key', //IDEALMENTE CAMBIAR POR UNA VARIABLE DE ENTORNO
+        secret: process.env.JWT_SECRET, //IDEALMENTE CAMBIAR POR UNA VARIABLE DE ENTORNO
       });
 
       return {

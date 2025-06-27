@@ -10,7 +10,7 @@ import { HttpModule } from '@nestjs/axios';
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: 'jwt-secret-key',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
     HttpModule,

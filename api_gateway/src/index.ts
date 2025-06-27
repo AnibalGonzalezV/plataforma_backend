@@ -44,34 +44,34 @@ app.patch(
 )
 
 app.patch(
-	'/users/usuarios/change-password',
+	'/usuarios/change-password',
 	authenticateToken,
 	httpProxy('http://user-service:3002')
 )
 
 app.patch(
-	'/users/usuarios/:id/roles',
+	'/usuarios/:id/roles',
 	authenticateToken,
 	authorizeRoles('administrador'),
 	httpProxy('http://user-service:3002')
 )
 
 app.get(
-	'/users/usuarios/count-by-role',
+	'/usuarios/count-by-role',
 	authenticateToken,
 	authorizeRoles('administrador'),
 	httpProxy('http://user-service:3002')
 )
 
 app.patch(
-	'/users/usuarios/:id/disable',
+	'/usuarios/:id/disable',
 	authenticateToken,
 	authorizeRoles('administrador'),
 	httpProxy('http://user-service:3002')
 )
 
 app.patch(
-	'/users/usuarios/:id/enable',
+	'/usuarios/:id/enable',
 	authenticateToken,
 	authorizeRoles('administrador'),
 	httpProxy('http://user-service:3002')

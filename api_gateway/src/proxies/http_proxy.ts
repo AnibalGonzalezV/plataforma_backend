@@ -1,34 +1,36 @@
-import { Request, RequestHandler, Response } from 'express'
+import { Request, Response, RequestHandler } from 'express'
 import axios from 'axios'
 
 const httpProxy = (target: string): RequestHandler => {
-	return async (req, res) => {
-		const proxiedPath = req.originalUrl.replace(req.baseUrl, '') || '/'
-		const targetUrl = new URL(proxiedPath, target).toString()
-
+	return async (req: Request, res: Response) => {
 		try {
-			// Prepara el body
-			const bodyString = JSON.stringify(req.body || {})
-			// Copia y ajusta las cabeceras
+			const targetUrl = new URL(req.url, target).toString()
+
+			// Debug opcional:
+			console.log(`[Proxy] ${req.method} -> ${targetUrl}`)
+
 			const headers = { ...req.headers } as Record<string, string>
 			delete headers.host
-			headers['content-type'] = 'application/json'
-			headers['content-length'] = Buffer.byteLength(bodyString).toString()
+
+			const isGetOrDelete = ['GET', 'DELETE'].includes(req.method.toUpperCase())
+			const body = isGetOrDelete ? undefined : req.body
 
 			const response = await axios.request({
 				method: req.method,
 				url: targetUrl,
-				data: bodyString,
 				headers,
+				data: body,
 				params: req.query,
-				// si usas cookies o auth, quizá necesites: withCredentials: true
 			})
 
 			res.status(response.status).json(response.data)
 		} catch (error: any) {
-			res
-				.status(error.response?.status || 500)
-				.json({ error: error.response?.data || error.message })
+			console.error(`[Proxy Error] ${error.message}`)
+			const status = error.response?.status || 500
+			const data = error.response?.data || {
+				message: 'Error interno del proxy',
+			}
+			res.status(status).json(data)
 		}
 	}
 }

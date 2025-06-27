@@ -34,17 +34,29 @@ export class UserService {
 
   async findAll(): Promise<Partial<User>[]> {
     const users = await this.userRepo.findAllUsers();
-    return users.map(({ id, email, names, lastNames, phoneNumber, address, registrationDate, isActive, roles }) => ({
-      id,
-      email,
-      names,
-      lastNames,
-      phoneNumber,
-      address,
-      registrationDate,
-      isActive,
-      roles,
-    }));
+    return users.map(
+      ({
+        id,
+        email,
+        names,
+        lastNames,
+        phoneNumber,
+        address,
+        registrationDate,
+        isActive,
+        roles,
+      }) => ({
+        id,
+        email,
+        names,
+        lastNames,
+        phoneNumber,
+        address,
+        registrationDate,
+        isActive,
+        roles,
+      }),
+    );
   }
 
   async findByEmail(email: string): Promise<User> {

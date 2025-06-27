@@ -33,12 +33,16 @@ export class UserService {
   }
 
   async findAll(): Promise<Partial<User>[]> {
-    const users = await this.userRepo.findAllActiveUsers();
-    return users.map(({ id, email, names, lastNames, roles }) => ({
+    const users = await this.userRepo.findAllUsers();
+    return users.map(({ id, email, names, lastNames, phoneNumber, address, registrationDate, isActive, roles }) => ({
       id,
       email,
       names,
       lastNames,
+      phoneNumber,
+      address,
+      registrationDate,
+      isActive,
       roles,
     }));
   }

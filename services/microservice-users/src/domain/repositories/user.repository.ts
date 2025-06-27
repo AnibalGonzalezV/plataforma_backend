@@ -10,8 +10,8 @@ export class UserRepository extends Repository<User> {
     return this.findOne({ where: { email } });
   }
 
-  async findAllActiveUsers(): Promise<User[]> {
-    return this.find({ where: { isActive: true } });
+  async findAllUsers(): Promise<User[]> {
+    return this.find();
   }
   async createUser(user: Partial<User>): Promise<User> {
     const newUser = this.create(user);

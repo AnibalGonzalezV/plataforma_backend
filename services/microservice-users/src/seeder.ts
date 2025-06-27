@@ -73,7 +73,7 @@ async function bootstrap() {
   const locatario2 = await createUser(
     'locatario2@vecinos.cl',
     'loca123',
-    ['vendedor'],
+    ['comprador', 'vendedor'],
     { names: 'Ana', lastNames: 'Comercio' },
   );
 

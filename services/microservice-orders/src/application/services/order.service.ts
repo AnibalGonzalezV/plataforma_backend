@@ -22,7 +22,6 @@ export class OrderService {
 
     const productIds = items.map((item) => item.productId);
 
-    // 1. Obtener datos de productos desde products-service
     const { data: products } = await firstValueFrom(
       this.httpService.post(
         `${process.env.PRODUCT_SERVICE_URL}/products/bulk-check`,
@@ -32,7 +31,6 @@ export class OrderService {
       ),
     );
 
-    // 2. Verificar stock y calcular total
     let total = 0;
     for (const item of items) {
       const product = products.find((p) => p.productId === item.productId);
@@ -42,28 +40,26 @@ export class OrderService {
           HttpStatus.NOT_FOUND,
         );
       }
-
       if (product.quantity < item.quantity) {
         throw new HttpException(
           `Stock insuficiente para ${product.name}`,
           HttpStatus.BAD_REQUEST,
         );
       }
-
       total += Number(product.price) * item.quantity;
     }
 
-    // 3. Descontar stock
     await firstValueFrom(
       this.httpService.post(
-        `${process.env.PRODUCT_SERVICE_URL}/products/bulk-decrease-stock`,
+        `${process.env.PRODUCT_SERVICE_URL}/products/decrease-stock`,
         items,
       ),
     );
 
-    // 4. Crear orden
     const order = await this.orderRepo.createOrder({
       ...orderData,
+      courierId: null,
+      deliveryState: 'pendiente',
       totalAmount: total,
     });
 
@@ -157,5 +153,18 @@ export class OrderService {
 
   async clearOrderItems(orderId: number): Promise<void> {
     await this.orderItemRepo.deleteByOrderId(orderId);
+  }
+
+  async getOrderWithItems(id: number) {
+    const order = await this.orderRepo.findById(id);
+    if (!order)
+      throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
+
+    const items = await this.orderItemRepo.findByOrderId(id);
+    return { order, items };
+  }
+
+  async findOrdersByState(state: string): Promise<Order[]> {
+    return this.orderRepo.findByState(state);
   }
 }

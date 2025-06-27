@@ -49,4 +49,8 @@ export class OrderRepository extends Repository<Order> {
     await this.updateOrder(orderId, { courierId, deliveryState: 'activo' });
     return this.findById(orderId);
   }
+
+  async findByState(state: string): Promise<Order[]> {
+    return this.find({ where: { deliveryState: state } });
+  }
 }

@@ -41,6 +41,16 @@ export class OrderController {
     return this.orderService.getItemsByOrderId(id);
   }
 
+  @Get('state/:state')
+  findByState(@Param('state') state: string) {
+    return this.orderService.findOrdersByState(state);
+  }
+
+  @Get(':id/detail')
+  getOrderDetail(@Param('id') id: number) {
+    return this.orderService.getOrderWithItems(id);
+  }
+
   @Post('assign/:orderId/:courierId')
   assignOrderToCourier(
     @Param('orderId') orderId: number,
@@ -65,6 +75,11 @@ export class OrderController {
     @Body() dto: UpdateOrderItemDto,
   ) {
     return this.orderService.updateOrderItemsQuantity(orderId, dto);
+  }
+
+  @Patch(':id/mark-delivered')
+  markAsDelivered(@Param('id') id: number) {
+    return this.orderService.updateOrder(id, { deliveryState: 'entregado' });
   }
 
   @Delete(':id')

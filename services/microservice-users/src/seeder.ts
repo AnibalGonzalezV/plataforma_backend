@@ -15,7 +15,7 @@ async function bootstrap() {
   const courierRepo = app.get(CourierRepository);
 
   console.log('Cargando roles...');
-  const roleNames = ['administrador', 'comprador', 'vendedor', 'repartidor']; //administrador, comprador, vendedor, repartidor
+  const roleNames = ['administrador', 'comprador', 'vendedor', 'repartidor'];
   const roleMap: Record<string, any> = {};
 
   for (const name of roleNames) {
@@ -58,7 +58,7 @@ async function bootstrap() {
     return user;
   };
 
-  const admin = await createUser('admin@vecinos.cl', 'admin123', ['admin'], {
+  const admin = await createUser('admin@vecinos.cl', 'admin123', ['comprador', 'administrador'], {
     names: 'Admin',
     lastNames: 'Vecinal',
   });
@@ -66,14 +66,14 @@ async function bootstrap() {
   const locatario1 = await createUser(
     'locatario1@vecinos.cl',
     'loca123',
-    ['locatario'],
+    ['comprador', 'vendedor'],
     { names: 'Juan', lastNames: 'Mercado' },
   );
 
   const locatario2 = await createUser(
     'locatario2@vecinos.cl',
     'loca123',
-    ['locatario'],
+    ['vendedor'],
     { names: 'Ana', lastNames: 'Comercio' },
   );
 
@@ -87,7 +87,7 @@ async function bootstrap() {
   const repartidor = await createUser(
     'repartidor@vecinos.cl',
     'reparto123',
-    ['repartidor'],
+    ['comprador', 'repartidor'],
     { names: 'Pedro', lastNames: 'Reparto' },
   );
 

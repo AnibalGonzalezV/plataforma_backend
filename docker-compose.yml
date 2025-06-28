@@ -64,6 +64,8 @@ services:
     build: ./api_gateway
     ports:
       - '3003:3003'
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - ./api_gateway/public:/app/public
     depends_on:

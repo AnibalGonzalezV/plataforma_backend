@@ -169,5 +169,28 @@ services:
       - postgres
     command: sh -c "until nc -z products-service 3006; do echo 'Esperando PostgresSQL...'; sleep 1; done; yarn seed:prod"
 
+  reviews-service:
+    build: ./services/microservice-reviews
+    ports:
+      - '3007:3007'
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      ORDER_SERVICE_URL: ${ORDER_SERVICE_URL}
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
+    depends_on:
+      - postgres
+      - user-service
+      - orders-service
+    entrypoint:
+      [
+        'sh',
+        '-c',
+        'until nc -z ${DB_HOST} ${DB_PORT}; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
+      ]
+
 volumes:
   postgres_data:

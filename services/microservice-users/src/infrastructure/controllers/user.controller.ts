@@ -56,8 +56,13 @@ export class UserController {
   }
 
   @Get('all')
-  findAll() {
+  async findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  async findById(@Param('id') id: number) {
+    return this.usersService.findById(id);
   }
 
   @Get(':id/roles')

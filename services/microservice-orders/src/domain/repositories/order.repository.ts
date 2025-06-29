@@ -39,14 +39,14 @@ export class OrderRepository extends Repository<Order> {
   }
 
   async findNewOrders(): Promise<Order[]> {
-    return this.find({ where: { deliveryState: 'nuevo' } });
+    return this.find({ where: { deliveryState: 'pendiente' } });
   }
 
   async assignOrderToCourier(
     orderId: number,
     courierId: number,
   ): Promise<Order | null> {
-    await this.updateOrder(orderId, { courierId, deliveryState: 'activo' });
+    await this.updateOrder(orderId, { courierId, deliveryState: 'en_proceso' });
     return this.findById(orderId);
   }
 

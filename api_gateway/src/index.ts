@@ -88,6 +88,8 @@ app.use('/metrics', httpProxy('http://metrics-service:3004'))
 
 app.use('/products', httpProxy('http://products-service:3006'))
 
+app.use('/reviews', httpProxy('http://reviews-service:3007'))
+
 app.listen(port, () => {
 	console.log(`API Gateway is running at http://localhost:${port}`)
 })

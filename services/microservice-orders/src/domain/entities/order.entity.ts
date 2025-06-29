@@ -16,8 +16,8 @@ export class Order {
   @Column({ name: 'client_id' })
   clientId: number;
 
-  @Column({ name: 'courier_id' })
-  courierId: number;
+  @Column({ name: 'courier_id', nullable: true })
+  courierId: number | null;
 
   @Column({ name: 'delivery_type' })
   deliveryType: string;

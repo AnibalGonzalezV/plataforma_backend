@@ -78,8 +78,8 @@ export class OrderController {
   }
 
   @Patch(':id/mark-delivered')
-  markAsDelivered(@Param('id') id: number) {
-    return this.orderService.updateOrder(id, { deliveryState: 'entregado' });
+  markOrderAsDelivered(@Param('id') id: number) {
+    return this.orderService.markOrderAsDelivered(id);
   }
 
   @Delete(':id')

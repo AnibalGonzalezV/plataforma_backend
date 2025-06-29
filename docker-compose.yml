@@ -100,6 +100,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       USER_SERVICE_URL: ${USER_SERVICE_URL}
+      PRODUCT_SERVICE_URL: ${PRODUCT_SERVICE_URL}
     depends_on:
       - postgres
       - user-service
@@ -110,6 +111,27 @@ services:
         '-c',
         'until nc -z ${DB_HOST} ${DB_PORT}; do echo "Esperando PostgreSQL..."; sleep 1; done; yarn start:prod',
       ]
+
+  seed-orders:
+    build: ./services/microservice-orders
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
+      PRODUCT_SERVICE_URL: ${PRODUCT_SERVICE_URL}
+    depends_on:
+      - postgres
+      - user-service
+      - products-service
+    command: >
+      sh -c "
+        until nc -z user-service 3002; do echo 'Esperando user-service...'; sleep 1; done;
+        until nc -z products-service 3006; do echo 'Esperando products-service...'; sleep 1; done;
+        yarn seed:prod
+      "
 
   products-service:
     build: ./services/microservice-product
@@ -122,6 +144,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       USER_SERVICE_URL: ${USER_SERVICE_URL}
+      PRODUCT_SERVICE_URL: ${PRODUCT_SERVICE_URL}
     depends_on:
       - postgres
       - user-service

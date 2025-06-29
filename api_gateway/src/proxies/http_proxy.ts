@@ -5,22 +5,23 @@ const httpProxy = (target: string): RequestHandler => {
 	return async (req: Request, res: Response) => {
 		try {
 			const targetUrl = new URL(req.url, target).toString()
-
-			// Debug opcional:
 			console.log(`[Proxy] ${req.method} -> ${targetUrl}`)
 
-			const headers = { ...req.headers } as Record<string, string>
-			delete headers.host
+			const headers = {
+				...req.headers,
+			}
 
-			const isGetOrDelete = ['GET', 'DELETE'].includes(req.method.toUpperCase())
-			const body = isGetOrDelete ? undefined : req.body
+			delete headers['host']
+			delete headers['content-length'] // 👈 muy importante
+			delete headers['transfer-encoding']
 
-			const response = await axios.request({
+			const response = await axios({
 				method: req.method,
 				url: targetUrl,
 				headers,
-				data: body,
+				data: req.body, // asegúrate que body está presente
 				params: req.query,
+				validateStatus: () => true, // evita errores por status 4xx/5xx
 			})
 
 			res.status(response.status).json(response.data)

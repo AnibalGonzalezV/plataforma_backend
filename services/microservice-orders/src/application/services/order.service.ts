@@ -117,7 +117,7 @@ export class OrderService {
     // 1. Verificar disponibilidad
     const { data: courier } = await firstValueFrom(
       this.httpService.get(
-        `${process.env.USER_SERVICE_URL}/users/couriers/${courierId}`,
+        `${process.env.USER_SERVICE_URL}/couriers/${courierId}`,
       ),
     );
 
@@ -137,7 +137,7 @@ export class OrderService {
     // 3. Marcar courier como no disponible
     await firstValueFrom(
       this.httpService.patch(
-        `${process.env.USER_SERVICE_URL}/users/couriers/${courierId}`,
+        `${process.env.USER_SERVICE_URL}/couriers/${courierId}`,
         {
           available: false,
         },
@@ -166,5 +166,39 @@ export class OrderService {
 
   async findOrdersByState(state: string): Promise<Order[]> {
     return this.orderRepo.findByState(state);
+  }
+
+  async markOrderAsDelivered(orderId: number): Promise<Order | null> {
+    const order = await this.orderRepo.findById(orderId);
+    if (!order) {
+      throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
+    }
+
+    const updatedOrder = await this.orderRepo.updateOrder(orderId, {
+      deliveryState: 'entregado',
+    });
+
+    if (order.deliveryType === 'retiro_en_tienda') {
+      // Si es retiro en tienda, no se necesita notificar al courier
+      return updatedOrder;
+    }
+
+    if (order.courierId) {
+      try {
+        await firstValueFrom(
+          this.httpService.patch(
+            `${process.env.USER_SERVICE_URL}/couriers/${order.courierId}`,
+            { available: true },
+          ),
+        );
+      } catch (error) {
+        console.error(
+          `Error al marcar al courier ${order.courierId} como disponible:`,
+          error.message || error,
+        );
+      }
+    }
+
+    return updatedOrder;
   }
 }

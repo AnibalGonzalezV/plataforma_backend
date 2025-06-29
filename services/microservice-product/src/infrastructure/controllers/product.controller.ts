@@ -13,6 +13,7 @@ import {
 import { ProductService } from 'src/application/services/product.service';
 import { CreateProductDto } from 'src/application/dtos/create-product.dto';
 import { UpdateProductDto } from 'src/application/dtos/update-product.dto';
+import { BulkCheckDto } from 'src/application/dtos/bulk-check.dto';
 
 @Controller('products')
 export class ProductController {
@@ -69,8 +70,11 @@ export class ProductController {
   }
 
   @Post('bulk-check')
-  async bulkCheck(@Body() productIds: number[]) {
-    return this.productService.bulkCheck(productIds);
+  async bulkCheck(@Body() dto: BulkCheckDto) {
+    if (!Array.isArray(dto.productIds)) {
+      throw new BadRequestException('productIds debe ser un arreglo');
+    }
+    return this.productService.bulkCheck(dto.productIds);
   }
 
   @Post('decrease-stock')

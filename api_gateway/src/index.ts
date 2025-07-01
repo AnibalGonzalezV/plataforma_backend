@@ -76,6 +76,21 @@ app.patch(
 	authorizeRoles('administrador'),
 	httpProxy('http://user-service:3002')
 )
+
+app.patch(
+	'/stores/:storeId',
+	authenticateToken,
+	authorizeRoles('vendedor', 'administrador'),
+	httpProxy('http://user-service:3002')
+)
+
+app.patch(
+	'/products/:productId',
+	authenticateToken,
+	authorizeRoles('vendedor', 'administrador'),
+	httpProxy('http://products-service:3006')
+)
+
 //Rutas publicas
 
 app.use('/users', httpProxy('http://user-service:3002'))

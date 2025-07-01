@@ -7,21 +7,26 @@ const httpProxy = (target: string): RequestHandler => {
 			const targetUrl = new URL(req.url, target).toString()
 			console.log(`[Proxy] ${req.method} -> ${targetUrl}`)
 
+			// Copia los headers originales
 			const headers = {
 				...req.headers,
+				'x-user-id': req.headers['x-user-id'],
+				'x-user-email': req.headers['x-user-email'],
+				'x-user-roles': req.headers['x-user-roles'],
 			}
 
+			// ❌ Elimina headers conflictivos
 			delete headers['host']
-			delete headers['content-length'] // 👈 muy importante
+			delete headers['content-length']
 			delete headers['transfer-encoding']
 
 			const response = await axios({
 				method: req.method,
 				url: targetUrl,
 				headers,
-				data: req.body, // asegúrate que body está presente
+				data: req.body,
 				params: req.query,
-				validateStatus: () => true, // evita errores por status 4xx/5xx
+				validateStatus: () => true, // Evita que Axios lance errores por status 4xx/5xx
 			})
 
 			res.status(response.status).json(response.data)

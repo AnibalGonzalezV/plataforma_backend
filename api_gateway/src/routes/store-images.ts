@@ -31,8 +31,8 @@ router.post(
 	upload.single('image'),
 	async (req: Request, res: Response) => {
 		try {
-			const user = (req as any).user
 			const storeId = Number(req.params.storeId)
+			const userId = Number(req.headers['x-user-id'])
 
 			if (!req.file) {
 				res.status(400).json({ message: 'No file uploaded' })
@@ -42,31 +42,34 @@ router.post(
 			// Validate store ownership
 			const storeResponse = await axios.get(
 				`http://user-service:3002/stores/${storeId}`
-			) // Replace with actual store service URL
+			)
 			const store = storeResponse.data
 
 			if (!store) {
-				fs.unlinkSync(req.file.path) // Delete the file if store not found
+				fs.unlinkSync(req.file.path)
 				res.status(404).json({ message: 'Store not found' })
 				return
 			}
 
-			if (store.owner.id !== user.userId) {
-				fs.unlinkSync(req.file.path) // Delete the file if user is not the owner
+			if (store.owner.id !== userId) {
+				fs.unlinkSync(req.file.path)
 				res.status(403).json({
 					message: 'You do not have permission to upload images for this store',
 				})
 				return
 			}
 
-			const imageUrl = `/public/store-images/${req.file.filename}` // Adjust the URL as needed
+			const imageUrl = `/public/store-images/${req.file.filename}`
 
 			await axios.patch(
-				`http://user-service:3002/stores/${storeId}`,
+				`http://localhost:3003/stores/${storeId}`,
 				{ imageUrl },
 				{
 					headers: {
-						Authorization: req.headers['authorization'], // Pass the original authorization header
+						Authorization: req.headers['authorization'],
+						'x-user-id': req.headers['x-user-id'] as string,
+						'x-user-email': req.headers['x-user-email'] as string, // opcional
+						'x-user-roles': req.headers['x-user-roles'] as string, // reenviamos el token
 					},
 				}
 			)
@@ -76,7 +79,7 @@ router.post(
 			console.error('Error uploading image:', error)
 
 			if (req.file && fs.existsSync(req.file.path)) {
-				fs.unlinkSync(req.file.path) // Clean up the uploaded file in case of error
+				fs.unlinkSync(req.file.path)
 			}
 
 			res.status(500).json({ message: 'Internal server error' })

@@ -1,4 +1,4 @@
-//Implementar logica de manejo de imagenes de productos
+// Implementar logica de manejo de imagenes de productos
 import { Router, Request, Response } from 'express'
 import multer from 'multer'
 import path from 'path'
@@ -31,8 +31,8 @@ router.post(
 	upload.single('image'),
 	async (req: Request, res: Response) => {
 		try {
-			const user = (req as any).user
 			const productId = Number(req.params.productId)
+			const userId = Number(req.headers['x-user-id'])
 
 			if (!req.file) {
 				res.status(400).json({ message: 'No file uploaded' })
@@ -50,7 +50,7 @@ router.post(
 				return
 			}
 
-			if (product.store.owner.id !== user.userId) {
+			if (product.store.owner.id !== userId) {
 				fs.unlinkSync(req.file.path) // Delete the file if user is not the owner of the store
 				res.status(403).json({
 					message: 'You are not authorized to upload images for this product',
@@ -61,11 +61,14 @@ router.post(
 			const imageUrl = `/public/product-images/${req.file.filename}`
 
 			await axios.patch(
-				`http://products-service:3006/products/${productId}/image`,
+				`http://localhost:3003/products/${productId}`,
 				{ imageUrl },
 				{
 					headers: {
 						Authorization: req.headers['authorization'],
+						'x-user-id': req.headers['x-user-id'] as string,
+						'x-user-email': req.headers['x-user-email'] as string, // opcional
+						'x-user-roles': req.headers['x-user-roles'] as string, // reenviamos el token
 					},
 				}
 			)

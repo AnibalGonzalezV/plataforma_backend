@@ -10,7 +10,11 @@ const router = Router()
 
 const storage = multer.diskStorage({
 	destination: (_req, _file, cb) => {
-		cb(null, path.join(__dirname, '../../public/product-images'))
+		const dir = path.join(__dirname, '../../public/product-images')
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir, { recursive: true }) // Crea la carpeta si no existe
+		}
+		cb(null, dir)
 	},
 	filename: (_req, file, cb) => {
 		const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)

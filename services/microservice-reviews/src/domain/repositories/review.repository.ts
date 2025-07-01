@@ -8,10 +8,14 @@ export class ReviewRepository extends Repository<Review> {
     super(Review, dataSource.createEntityManager());
   }
 
-  async createReview(dto: CreateReviewDto): Promise<Review> {
+  async createReview(
+    orderId: number,
+    userId: number,
+    dto: CreateReviewDto,
+  ): Promise<Review> {
     const newReview = this.create({
-      order_id: dto.order_id,
-      user_id: dto.user_id,
+      order_id: orderId,
+      user_id: userId,
       score: dto.score,
       comment: dto.comment,
     });

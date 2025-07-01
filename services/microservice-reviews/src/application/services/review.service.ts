@@ -32,11 +32,15 @@ export class ReviewService {
     }
   }
 
-  async createReview(dto: CreateReviewDto): Promise<Review> {
+  async createReview(
+    orderId: number,
+    userId: number,
+    dto: CreateReviewDto,
+  ): Promise<Review> {
     // Validar orden existe y pertenece al usuario (cliente)
     const orderResponse = await lastValueFrom(
       this.httpService.get(
-        `${process.env.ORDER_SERVICE_URL}/orders/${dto.order_id}`,
+        `${process.env.ORDER_SERVICE_URL}/orders/${orderId}`,
       ),
     );
     const order = orderResponse.data;
@@ -45,25 +49,25 @@ export class ReviewService {
       throw new NotFoundException('Order not found');
     }
 
-    if (order.client_id !== dto.user_id) {
+    if (order.clientId !== userId) {
       throw new ConflictException(
         'User is not authorized to review this order',
       );
     }
 
     // Validar que usuario exista en microservicio users
-    await this.validateUser(dto.user_id);
+    await this.validateUser(userId);
 
     // Verificar que no exista review previa para esa orden y usuario
     const existingReview = await this.reviewRepository.findById(
-      dto.order_id,
-      dto.user_id,
+      orderId,
+      userId,
     );
     if (existingReview) {
       throw new ConflictException('Review already exists');
     }
 
-    return this.reviewRepository.createReview(dto);
+    return this.reviewRepository.createReview(orderId, userId, dto);
   }
 
   async findByOrder(orderId: number): Promise<(Review & { user?: any })[]> {
@@ -77,7 +81,15 @@ export class ReviewService {
       reviews.map(async (review) => {
         try {
           const user = await this.validateUser(review.user_id);
-          return { ...review, user };
+          return {
+            ...review,
+            user: {
+              names: user.names,
+              surnames: user.surnames,
+              email: user.email,
+              phone: user.phone,
+            },
+          };
         } catch {
           return review;
         }
@@ -107,6 +119,59 @@ export class ReviewService {
     if (!review) {
       throw new NotFoundException('Review not found');
     }
+
+    // Validar que el usuario sea el propietario de la review
+    if (review.user_id !== userId) {
+      throw new BadRequestException(
+        'User is not authorized to delete this review',
+      );
+    }
+
     await this.reviewRepository.deleteReview(orderId, userId);
+  }
+
+  async findByStore(storeId: number): Promise<(Review & { user?: any })[]> {
+    const ordersResponse = await lastValueFrom(
+      this.httpService.get(
+        `${process.env.ORDER_SERVICE_URL}/orders/by-store/${storeId}`,
+      ),
+    );
+
+    const orders = ordersResponse.data;
+
+    if (!orders || !orders.length) {
+      throw new NotFoundException('No orders found for this store');
+    }
+
+    const ordersIds = orders.map((order) => order.id);
+
+    const reviews = await this.reviewRepository.find({
+      where: ordersIds.map((id) => ({ order_id: id })),
+    });
+
+    if (!reviews.length) {
+      throw new NotFoundException('No reviews found for this store');
+    }
+
+    // Enriquecer cada review con datos de la orden
+    const reviewsWithOrder = await Promise.all(
+      reviews.map(async (review) => {
+        try {
+          const user = await this.validateUser(review.user_id);
+          return {
+            ...review,
+            user: {
+              names: user.names,
+              surnames: user.surnames,
+              email: user.email,
+              phone: user.phone,
+            },
+          };
+        } catch (error) {
+          return review;
+        }
+      }),
+    );
+    return reviewsWithOrder;
   }
 }

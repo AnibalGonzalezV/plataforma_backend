@@ -51,6 +51,11 @@ export class OrderController {
     return this.orderService.getOrderWithItems(id);
   }
 
+  @Get('by-store/:storeId')
+  getOrdersByStore(@Param('storeId') storeId: number) {
+    return this.orderService.findByStoreId(Number(storeId));
+  }
+
   @Post('assign/:orderId/:courierId')
   assignOrderToCourier(
     @Param('orderId') orderId: number,

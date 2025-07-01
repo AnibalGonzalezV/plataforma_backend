@@ -201,4 +201,8 @@ export class OrderService {
 
     return updatedOrder;
   }
+
+  async findByStoreId(storeId: number): Promise<Order[]> {
+    return this.orderRepo.find({ where: { storeId } });
+  }
 }

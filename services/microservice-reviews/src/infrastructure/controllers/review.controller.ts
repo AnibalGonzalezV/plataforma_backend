@@ -7,9 +7,13 @@ import { CreateReviewDto } from 'src/application/dtos/create-review.dto';
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @Post()
-  create(@Body() dto: CreateReviewDto) {
-    return this.reviewService.createReview(dto);
+  @Post('create/:orderId/:userId')
+  create(
+    @Param('orderId') orderId: string,
+    @Param('userId') userId: string,
+    @Body() dto: CreateReviewDto,
+  ) {
+    return this.reviewService.createReview(+orderId, +userId, dto);
   }
 
   @Get('order/:orderId')
@@ -22,7 +26,12 @@ export class ReviewController {
     return this.reviewService.findByUser(userId);
   }
 
-  @Get()
+  @Get('store/:storeId')
+  findByStore(@Param('storeId') storeId: number) {
+    return this.reviewService.findByStore(storeId);
+  }
+
+  @Get('all')
   findAll() {
     return this.reviewService.findAll();
   }

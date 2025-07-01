@@ -50,11 +50,15 @@ router.post(
 				return
 			}
 
-			if (product.store.owner.id !== userId) {
-				fs.unlinkSync(req.file.path) // Delete the file if user is not the owner of the store
-				res.status(403).json({
-					message: 'You are not authorized to upload images for this product',
-				})
+			const storeId = product.storeId
+			const storeResponse = await axios.get(
+				`http://user-service:3002/stores/${storeId}`
+			)
+			const store = storeResponse.data
+
+			if (!store.owner || store.owner.id !== userId) {
+				fs.unlinkSync(req.file.path) // Delete the file if store owner not found
+				res.status(403).json({ message: 'You are not authorized' })
 				return
 			}
 

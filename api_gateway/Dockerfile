@@ -4,10 +4,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copia package files primero
-COPY package.json yarn.lock ./
+COPY package.json ./
 
 # Instala todas las dependencias (dev y prod)
-RUN yarn install --frozen-lockfile
+RUN yarn install 
 
 # Copia solo el código fuente
 COPY tsconfig.json ./
